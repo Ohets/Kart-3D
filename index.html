@@ -6,53 +6,51 @@
     <title>Retro Kart 3D</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #111; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #111; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; }
         #canvas3d { display: block; width: 100%; height: 100%; }
 
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.8);[...]
+        .overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); padding: 20px; z-index: 10; }
         .hidden { display: none !important; }
 
         h1 { font-size: 2.5rem; margin-bottom: 10px; color: #ffcc00; text-shadow: 3px 3px #ff3300; text-transform: uppercase; letter-spacing: 2px; }
         h2 { font-size: 1.5rem; margin-bottom: 20px; color: #00ffff; }
         p { font-size: 1rem; margin-bottom: 20px; max-width: 500px; color: #ddd; line-height: 1.5; }
 
-        .btn { background: linear-gradient(135deg, #ffcc00, #ff9900); color: #000; border: none; padding: 15px 35px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; cursor: pointer; box[...]
+        .btn { background: linear-gradient(135deg, #ffcc00, #ff9900); color: #000; border: none; padding: 15px 35px; font-size: 1.1rem; font-weight: bold; border-radius: 30px; cursor: pointer; transition: transform 0.12s ease; }
         .btn:hover { transform: scale(1.05); }
-        .btn:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(255,153,0,0.6); }
-        .btn-blue { background: linear-gradient(135deg, #00ffff, #0099ff); color: #fff; box-shadow: 0 5px 15px rgba(0,255,255,0.4); }
+        .btn:active { transform: scale(0.95); }
+        .btn-blue { background: linear-gradient(135deg, #00ffff, #0099ff); color: #fff; box-shadow: 0 5px 15px rgba(0,255,255,0.35); }
 
-        #hud { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; padding: 15px; display: flex; flex-direction: column; justify-content: space-betwee[...]
+        #hud { position: absolute; inset: 0; pointer-events: none; z-index: 5; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
         .hud-top { display: flex; justify-content: space-between; width: 100%; align-items: flex-start; }
-        .hud-card { background: rgba(0,0,0,0.7); border: 2px solid #333; padding: 12px 20px; border-radius: 15px; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; pointer-[...]
+        .hud-card { background: rgba(0,0,0,0.65); border: 2px solid #333; padding: 10px 18px; border-radius: 15px; font-weight: bold; display: flex; align-items: center; }
         .hud-yellow { border-color: #ffcc00; color: #ffcc00; }
         .hud-blue { border-color: #00ffff; color: #00ffff; }
+        .hud-orange { border-color: #ff9900; color: #ff9900; }
 
-        .level-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; max-height: 50vh; overflow-y: auto; padding: 10px; width: 100%; max-width: 700px; background: rgba(255,255,25[...]
-        @media (max-width: 600px) { .level-grid { grid-template-columns: repeat(4, 1fr); max-width: 500px; } }
-        .level-item { background: #222; border: 2px solid #444; border-radius: 10px; padding: 15px 8px; font-weight: bold; cursor: pointer; position: relative; transition: all 0.2s; text-align: ce[...]
+        .level-grid { display: grid; grid-template-columns: repeat(5, minmax(70px, 1fr)); gap: 10px; max-height: 50vh; overflow-y: auto; padding: 10px; width: min(700px, 100%); background: rgba(255,255,255,0.04); border-radius: 12px; }
+        @media (max-width: 600px) { .level-grid { grid-template-columns: repeat(4, minmax(60px, 1fr)); } }
+        .level-item { background: #222; border: 2px solid #444; border-radius: 10px; padding: 15px 8px; font-weight: bold; cursor: pointer; text-align: center; transition: all 0.2s ease; }
         .level-item:hover { background: #2a2a2a; transform: scale(1.02); }
         .level-item.unlocked { border-color: #00ff00; color: #00ff00; }
-        .level-item.locked { border-color: #ff3300; color: #999; opacity: 0.6; cursor: not-allowed; }
+        .level-item.locked { border-color: #ff3300; color: #999; opacity: 0.7; }
         .level-item.current { background: #ffcc00; color: #000; border-color: #fff; box-shadow: 0 0 15px rgba(255,204,0,0.6); }
-        .level-item .lock-cost { font-size: 0.75rem; display: block; color: #ff9900; margin-top: 5px; }
+        .level-item .lock-cost { display: block; margin-top: 5px; color: #ff9900; font-size: 0.75rem; }
 
         #controls { position: absolute; bottom: 20px; left: 0; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; z-index: 6; }
-        .control-btn { width: 80px; height: 80px; background: rgba(255,255,255,0.15); border: 3px solid rgba(255,255,255,0.6); border-radius: 50%; display: flex; justify-content: center; align-ite[...]
-        .control-btn:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
-        .control-btn:hover { background: rgba(255,255,255,0.25); }
         .ctrl-group { display: flex; gap: 15px; }
+        .control-btn { width: 80px; height: 80px; background: rgba(255,255,255,0.14); border: 3px solid rgba(255,255,255,0.6); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; font-weight: bold; color: white; touch-action: none; }
+        .control-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.96); }
 
-        #countdown { font-size: 8rem; font-weight: bold; color: #ffcc00; text-shadow: 4px 4px #000, 8px 8px rgba(0,0,0,0.5); display: none; pointer-events: none; }
+        #countdown { font-size: 7rem; font-weight: bold; color: #ffcc00; text-shadow: 4px 4px #000; display: none; pointer-events: none; }
 
-        .shop-options { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 450px; }
-        .shop-item { background: #222; border: 2px solid #555; padding: 18px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: [...]
-        .shop-item:hover { background: #2a2a2a; border-color: #f90; }
-        .shop-item:active { background: #333; }
+        .shop-options { display: flex; flex-direction: column; gap: 12px; width: min(450px, 100%); }
+        .shop-item { background: #222; border: 2px solid #555; border-radius: 15px; padding: 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .shop-item:hover { border-color: #ff9900; background: #2a2a2a; }
 
-        .mode-selector { display: flex; gap: 15px; margin-bottom: 20px; justify-content: center; }
-        .mode-btn { background: rgba(255,255,255,0.1); border: 2px solid #666; color: #fff; padding: 10px 25px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
-        .mode-btn.active { background: #ffcc00; color: #000; border-color: #ffcc00; box-shadow: 0 0 20px rgba(255,204,0,0.6); }
-        .mode-btn:hover { border-color: #ffcc00; }
+        .mode-selector { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .mode-btn { background: rgba(255,255,255,0.08); color: white; border: 2px solid #666; border-radius: 20px; padding: 10px 24px; font-weight: bold; cursor: pointer; }
+        .mode-btn.active { background: #ffcc00; color: #000; border-color: #ffcc00; box-shadow: 0 0 18px rgba(255,204,0,0.6); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -64,12 +62,15 @@
             <div class="hud-card hud-yellow">🪙 Credits: <span id="hud-credits">100</span></div>
             <div class="hud-card hud-blue">🏁 Mission: <span id="hud-level">1</span>/40</div>
         </div>
+
         <div class="hud-top" style="justify-content: center; margin-top: 20px;">
             <div id="countdown">3</div>
         </div>
-        <div class="hud-top" style="align-items: flex-end; height: 100px; justify-content: flex-start;">
+
+        <div class="hud-top" style="align-items: flex-end; justify-content: flex-start; height: 100px;">
             <div class="hud-card" style="color: #fff;">Pos: <span id="hud-pos">2</span>/2</div>
             <div class="hud-card hud-yellow" style="margin-left: 20px;">⚡ <span id="hud-speed">0</span> km/h</div>
+            <div class="hud-card hud-orange" style="margin-left: 20px;">Nitro: <span id="hud-nitro">100</span>%</div>
         </div>
     </div>
 
@@ -79,7 +80,8 @@
             <div class="control-btn" id="btn-right">▶</div>
         </div>
         <div class="ctrl-group">
-            <div class="control-btn" id="btn-gas" style="background: rgba(0,255,0,0.15); border-color: rgba(0,255,0,0.8);">▲</div>
+            <div class="control-btn" id="btn-gas" style="background: rgba(0,255,0,0.12); border-color: rgba(0,255,0,0.8);">▲</div>
+            <div class="control-btn" id="btn-boost" style="background: rgba(255,153,0,0.15); border-color: rgba(255,153,0,0.8);">⚡</div>
         </div>
     </div>
 
@@ -97,9 +99,9 @@
     <div id="menu-screen" class="overlay hidden">
         <h1>Retro Kart 3D</h1>
         <h2 id="menu-title">Wähle eine Mission</h2>
-        <div class="hud-card hud-yellow" style="margin-bottom: 15px; pointer-events:none; z-index: 21;">🪙 Deine Credits: <span id="menu-credits">100</span></div>
+        <div class="hud-card hud-yellow" style="margin-bottom:15px; pointer-events:none;">🪙 Deine Credits: <span id="menu-credits">100</span></div>
         <div class="level-grid" id="level-grid"></div>
-        <div style="display: flex; gap: 15px; margin-top: 20px;">
+        <div style="display:flex; gap:15px; margin-top:20px; flex-wrap: wrap; justify-content:center;">
             <button class="btn btn-blue" id="btn-open-shop">🛒 Credits kaufen</button>
             <button class="btn" id="btn-back-mode">⬅ Modus wählen</button>
         </div>
@@ -108,7 +110,7 @@
     <div id="result-screen" class="overlay hidden">
         <h1 id="result-title">🏆 Sieg!</h1>
         <p id="result-desc">Du hast das Ziel erreicht!</p>
-        <div class="hud-card hud-yellow" style="margin-bottom: 20px; pointer-events:none; z-index: 21;">🪙 Credits: <span id="result-credits">100</span></div>
+        <div class="hud-card hud-yellow" style="margin-bottom:20px; pointer-events:none;">🪙 Credits: <span id="result-credits">100</span></div>
         <button class="btn" id="btn-result-action">Nächstes Level</button>
         <button class="btn btn-blue" id="btn-result-menu">Hauptmenü</button>
     </div>
@@ -139,26 +141,22 @@
             bgmInterval: null,
             engineOsc: null,
             engineGain: null,
-            init() {
-                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-            },
+            init() { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
             playBGM() {
                 if(!this.ctx) this.init();
                 if(this.bgmInterval) return;
                 this.bgmInterval = setInterval(() => {
                     if(!gameState.playing) return;
+                    let note = [110,130,146,165,110,130,196,220][Math.floor(Date.now()/250) % 8];
                     let now = this.ctx.currentTime;
-                    let note = [110, 130, 146, 165, 110, 130, 196, 220][Math.floor(Date.now() / 250) % 8];
                     let osc = this.ctx.createOscillator();
                     let gain = this.ctx.createGain();
                     osc.type = 'triangle';
                     osc.frequency.setValueAtTime(note, now);
                     gain.gain.setValueAtTime(0.15, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-                    osc.start(now);
-                    osc.stop(now + 0.2);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(now); osc.stop(now + 0.2);
                 }, 250);
             },
             stopBGM() {
@@ -189,7 +187,7 @@
             playWin() {
                 if(!this.ctx) return;
                 let now = this.ctx.currentTime;
-                [261, 329, 392, 523].forEach((f, i) => {
+                [261,329,392,523].forEach((f, i) => {
                     let osc = this.ctx.createOscillator();
                     let gain = this.ctx.createGain();
                     osc.frequency.setValueAtTime(f, now + i * 0.1);
@@ -202,7 +200,7 @@
             playLoose() {
                 if(!this.ctx) return;
                 let now = this.ctx.currentTime;
-                [392, 349, 311, 246].forEach((f, i) => {
+                [392,349,311,246].forEach((f, i) => {
                     let osc = this.ctx.createOscillator();
                     let gain = this.ctx.createGain();
                     osc.frequency.setValueAtTime(f, now + i * 0.15);
@@ -231,11 +229,13 @@
             credits: parseInt(localStorage.getItem('mk3d_credits')) || 500,
             unlockedLevels: JSON.parse(localStorage.getItem('mk3d_levels')) || [1],
             currentLevel: 1,
+            mode: 'standard',
             playing: false,
             countdown: 3,
-            trackLength: 1000,
-            mode: 'standard'
+            trackLength: 1000
         };
+
+        const playerBoost = { energy: 100, active: false };
 
         function saveData() {
             localStorage.setItem('mk3d_credits', gameState.credits);
@@ -247,40 +247,34 @@
 
         let scene, camera, renderer;
         let playerVehicle, enemyVehicle;
-        let roadSegments = [];
-        let leftBarriers = [], rightBarriers = [];
-        let decorations = [];
-        let particles = [];
-
-        let keys = { left: false, right: false, gas: false };
+        let roadSegments = [], leftBarriers = [], rightBarriers = [], decorations = [], particles = [];
+        let keys = { left: false, right: false, gas: false, boost: false };
         let playerStats = { z: 0, x: 0, speed: 0, maxSpeed: 2.2, accel: 0.05, decel: 0.03 };
         let enemyStats = { z: 0, x: 2, speed: 1.8, targetX: 2 };
 
-        function getTrackCurve(z, mode) {
-            if(mode === 'pro') {
+        function curveAt(z) {
+            let m = gameState.mode;
+            if(m === 'pro') {
                 return Math.sin(z * 0.022) * 7.5 + Math.sin(z * 0.0075 + 1.7) * 5.2 + Math.sin(z * 0.0032 + 0.8) * 3.5 + Math.sin(z * 0.0013) * 1.8;
-            } else if(mode === 'extreme') {
-                return Math.sin(z * 0.028) * 9.6 + Math.sin(z * 0.009 + 2.1) * 6.3 + Math.sin(z * 0.0044 + 0.7) * 4.0 + Math.sin(z * 0.0017 + 1.4) * 2.3;
+            }
+            if(m === 'extreme') {
+                return Math.sin(z * 0.028) * 9.6 + Math.sin(z * 0.009 + 2.1) * 6.3 + Math.sin(z * 0.0044 + 0.7) * 4 + Math.sin(z * 0.0017 + 1.4) * 2.3;
             }
             return Math.sin(z * 0.013) * 8 + Math.sin(z * 0.005 + 1.8) * 4.8 + Math.sin(z * 0.0022) * 2.8;
         }
 
-        function curveAt(z) {
-            return getTrackCurve(z, gameState.mode);
-        }
-
         function curveSlope(z) {
-            if(gameState.mode === 'pro') {
+            let m = gameState.mode;
+            if(m === 'pro') {
                 return 0.165 * Math.cos(z * 0.022) + 0.039 * Math.cos(z * 0.0075 + 1.7) + 0.0112 * Math.cos(z * 0.0032 + 0.8) + 0.00235 * Math.cos(z * 0.0013);
-            } else if(gameState.mode === 'extreme') {
+            }
+            if(m === 'extreme') {
                 return 0.27 * Math.cos(z * 0.028) + 0.0567 * Math.cos(z * 0.009 + 2.1) + 0.0176 * Math.cos(z * 0.0044 + 0.7) + 0.0039 * Math.cos(z * 0.0017 + 1.4);
             }
             return 0.104 * Math.cos(z * 0.013) + 0.024 * Math.cos(z * 0.005 + 1.8) + 0.00616 * Math.cos(z * 0.0022);
         }
 
-        function angleAt(z) {
-            return Math.atan(curveSlope(z));
-        }
+        function angleAt(z) { return Math.atan(curveSlope(z)); }
 
         function init3D() {
             scene = new THREE.Scene();
@@ -296,16 +290,10 @@
             scene.add(ambient);
             let sun = new THREE.DirectionalLight(0xffffff, gameState.mode === 'extreme' ? 0.6 : 0.8);
             sun.position.set(10, 30, 20);
-            sun.castShadow = true;
             scene.add(sun);
 
-            let grassColor = gameState.mode === 'extreme' ? 0x1a3a1a : 0x3aa84c;
-            let grass = new THREE.Mesh(
-                new THREE.PlaneGeometry(500, 500),
-                new THREE.MeshPhongMaterial({ color: grassColor })
-            );
-            grass.rotation.x = -Math.PI / 2;
-            grass.position.y = -0.2;
+            let grass = new THREE.Mesh(new THREE.PlaneGeometry(500,500), new THREE.MeshPhongMaterial({ color: gameState.mode === 'extreme' ? 0x1a3a1a : 0x3aa84c }));
+            grass.rotation.x = -Math.PI / 2; grass.position.y = -0.2;
             scene.add(grass);
 
             buildTrackGrid();
@@ -319,33 +307,29 @@
             decorations.forEach(d => scene.remove(d));
             roadSegments = []; leftBarriers = []; rightBarriers = []; decorations = [];
 
-            let roadW = gameState.mode === 'extreme' ? 8.8 : (gameState.mode === 'pro' ? 10.2 : 11.8);
+            let roadW = gameState.mode === 'extreme' ? 9 : (gameState.mode === 'pro' ? 10.5 : 12);
             let segL = 20;
             let totalSegs = Math.ceil(gameState.trackLength / segL) + 5;
 
-            for(let i = 0; i < totalSegs; i++) {
+            for(let i=0; i<totalSegs; i++) {
                 let z = -i * segL;
                 let x = curveAt(z);
                 let ang = angleAt(z);
                 let isEven = i % 2 === 0;
 
-                let roadColor = isEven ? (gameState.mode === 'extreme' ? 0x333333 : 0x444444) : (gameState.mode === 'extreme' ? 0x2a2a2a : 0x555555);
-                let roadMat = new THREE.MeshPhongMaterial({ color: roadColor });
-                let road = new THREE.Mesh(new THREE.PlaneGeometry(roadW, segL + 1), roadMat);
+                let mat = new THREE.MeshPhongMaterial({ color: isEven ? (gameState.mode === 'extreme' ? 0x2d2d2d : 0x444444) : 0x555555 });
+                let road = new THREE.Mesh(new THREE.PlaneGeometry(roadW, segL + 1), mat);
                 road.rotation.x = -Math.PI / 2;
                 road.rotation.z = ang;
                 road.position.set(x, 0, z);
                 scene.add(road);
                 roadSegments.push(road);
 
-                let centerStripe = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.42, 0.05, segL * 0.52),
-                    new THREE.MeshBasicMaterial({ color: gameState.mode === 'extreme' ? 0xffff00 : 0xf7f7f7 })
-                );
-                centerStripe.position.set(x, 0.05, z);
-                centerStripe.rotation.z = ang;
-                scene.add(centerStripe);
-                decorations.push(centerStripe);
+                let stripe = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.05, segL * 0.52), new THREE.MeshBasicMaterial({ color: gameState.mode === 'extreme' ? 0xffff00 : 0xf7f7f7 }));
+                stripe.position.set(x, 0.05, z);
+                stripe.rotation.z = ang;
+                scene.add(stripe);
+                decorations.push(stripe);
 
                 let barrierColor = gameState.mode === 'pro' ? 0xff6600 : (gameState.mode === 'extreme' ? 0xff1111 : (isEven ? 0xff0000 : 0xffffff));
                 let barrierMat = new THREE.MeshPhongMaterial({ color: barrierColor });
@@ -354,37 +338,32 @@
                 let lb = new THREE.Mesh(barrierGeo, barrierMat);
                 lb.position.set(x - roadW / 2, 0.6, z);
                 lb.rotation.y = ang;
-                scene.add(lb);
-                leftBarriers.push(lb);
+                scene.add(lb); leftBarriers.push(lb);
 
                 let rb = new THREE.Mesh(barrierGeo, barrierMat);
                 rb.position.set(x + roadW / 2, 0.6, z);
                 rb.rotation.y = ang;
-                scene.add(rb);
-                rightBarriers.push(rb);
+                scene.add(rb); rightBarriers.push(rb);
 
                 if(i % 2 === 0) {
                     let side = Math.random() > 0.5 ? 1 : -1;
                     let tree = new THREE.Group();
-                    let trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 1.1, 8), new THREE.MeshPhongMaterial({ color: 0x8b5a2b }));
+                    let trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.22,1.1,8), new THREE.MeshPhongMaterial({ color: 0x8b5a2b }));
                     trunk.position.y = 0.55;
-                    let treeColor = gameState.mode === 'extreme' ? 0x1a5c1a : 0x2f9e44;
-                    let leaves = new THREE.Mesh(new THREE.SphereGeometry(0.8, 10, 10), new THREE.MeshPhongMaterial({ color: treeColor }));
+                    let leaves = new THREE.Mesh(new THREE.SphereGeometry(0.8, 10, 10), new THREE.MeshPhongMaterial({ color: gameState.mode === 'extreme' ? 0x1a5c1a : 0x2f9e44 }));
                     leaves.position.y = 1.5;
                     tree.add(trunk); tree.add(leaves);
                     tree.position.set(x + side * (roadW / 2 + 3), 0, z + (Math.random() - 0.5) * 6);
-                    scene.add(tree);
-                    decorations.push(tree);
+                    scene.add(tree); decorations.push(tree);
                 }
             }
 
-            let finishGeo = new THREE.BoxGeometry(roadW, 1, 1);
+            let finishGeo = new THREE.BoxGeometry(roadW,1,1);
             let finishMat = new THREE.MeshPhongMaterial({ color: gameState.mode === 'extreme' ? 0xff1111 : 0xffff00 });
             let finishSign = new THREE.Mesh(finishGeo, finishMat);
             finishSign.position.set(curveAt(-gameState.trackLength), 6, -gameState.trackLength);
             finishSign.rotation.y = angleAt(-gameState.trackLength);
-            scene.add(finishSign);
-            decorations.push(finishSign);
+            scene.add(finishSign); decorations.push(finishSign);
         }
 
         function buildVehicles() {
@@ -393,30 +372,23 @@
 
             playerVehicle = new THREE.Group();
             let body = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.6, 2.2), new THREE.MeshPhongMaterial({ color: 0x0099ff }));
-            body.position.y = 0.4;
-            playerVehicle.add(body);
+            body.position.y = 0.4; playerVehicle.add(body);
             let wheelGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.4, 12);
             let wheelMat = new THREE.MeshPhongMaterial({ color: 0x111111 });
-            [-0.8, 0.8].forEach(x => {
-                [-0.8, 0.8].forEach(z => {
+            [-0.8,0.8].forEach(x => {
+                [-0.8,0.8].forEach(z => {
                     let w = new THREE.Mesh(wheelGeo, wheelMat);
-                    w.rotation.z = Math.PI / 2;
-                    w.position.set(x, 0.3, z);
-                    playerVehicle.add(w);
+                    w.rotation.z = Math.PI / 2; w.position.set(x,0.3,z); playerVehicle.add(w);
                 });
             });
             scene.add(playerVehicle);
 
             enemyVehicle = new THREE.Group();
             let ebody = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.6, 2.2), new THREE.MeshPhongMaterial({ color: 0xff3333 }));
-            ebody.position.y = 0.4;
-            enemyVehicle.add(ebody);
-            [-0.8, 0.8].forEach(x => {
-                [-0.8, 0.8].forEach(z => {
-                    let w = new THREE.Mesh(wheelGeo, wheelMat);
-                    w.rotation.z = Math.PI / 2;
-                    w.position.set(x, 0.3, z);
-                    enemyVehicle.add(w);
+            ebody.position.y = 0.4; enemyVehicle.add(ebody);
+            [-0.8,0.8].forEach(x => {
+                [-0.8,0.8].forEach(z => {
+                    let w = new THREE.Mesh(wheelGeo, wheelMat); w.rotation.z = Math.PI / 2; w.position.set(x,0.3,z); enemyVehicle.add(w);
                 });
             });
             scene.add(enemyVehicle);
@@ -426,138 +398,35 @@
             let pGeo = new THREE.SphereGeometry(0.1, 4, 4);
             let pMat = new THREE.MeshBasicMaterial({ color: gameState.mode === 'extreme' ? 0xff1111 : 0xffcc00 });
             let p = new THREE.Mesh(pGeo, pMat);
-            p.position.set(x, y, z);
-            scene.add(p);
+            p.position.set(x,y,z); scene.add(p);
             particles.push({ mesh: p, vx: (Math.random()-0.5)*0.2, vy: Math.random()*0.2, vz: Math.random()*0.2, life: 20 });
         }
 
         function updateParticles() {
             for(let i = particles.length - 1; i >= 0; i--) {
                 let p = particles[i];
-                p.mesh.position.x += p.vx;
-                p.mesh.position.y += p.vy;
-                p.mesh.position.z += p.vz;
-                p.life--;
-                if(p.life <= 0) {
-                    scene.remove(p.mesh);
-                    particles.splice(i, 1);
-                }
+                p.mesh.position.x += p.vx; p.mesh.position.y += p.vy; p.mesh.position.z += p.vz; p.life--;
+                if(p.life <= 0) { scene.remove(p.mesh); particles.splice(i, 1); }
             }
         }
 
-        window.addEventListener('keydown', (e) => {
-            if(e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
-            if(e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
-            if(e.key === 'ArrowUp' || e.key === 'w') keys.gas = true;
-        });
-        window.addEventListener('keyup', (e) => {
-            if(e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
-            if(e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
-            if(e.key === 'ArrowUp' || e.key === 'w') keys.gas = false;
-        });
-
-        const wireTouch = (id, keyField) => {
-            let el = document.getElementById(id);
-            el.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keyField] = true; }, { passive: false });
-            el.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyField] = false; }, { passive: false });
-        };
-        wireTouch('btn-left', 'left');
-        wireTouch('btn-right', 'right');
-        wireTouch('btn-gas', 'gas');
-
-        function animate() {
-            requestAnimationFrame(animate);
-            if(!gameState.playing) return;
-
-            let accel = gameState.mode === 'extreme' ? 0.085 : (gameState.mode === 'pro' ? 0.065 : 0.05);
-            let maxSpeed = gameState.mode === 'extreme' ? 2.9 : (gameState.mode === 'pro' ? 2.6 : 2.2);
-
-            if(keys.gas) {
-                playerStats.speed = Math.min(playerStats.speed + accel, maxSpeed);
-            } else {
-                playerStats.speed = Math.max(playerStats.speed - 0.035, 0);
-            }
-
-            if(keys.left) playerStats.x -= 0.16;
-            if(keys.right) playerStats.x += 0.16;
-
-            playerStats.z -= playerStats.speed;
-
-            if(playerStats.x < -4.8) { playerStats.x = -4.8; playerStats.speed *= 0.55; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
-            if(playerStats.x > 4.8) { playerStats.x = 4.8; playerStats.speed *= 0.55; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
-
-            playerVehicle.position.set(curveAt(playerStats.z) + playerStats.x, 0, playerStats.z);
-            playerVehicle.rotation.y = angleAt(playerStats.z);
-
-            AudioEngine.playEngine(playerStats.speed / maxSpeed);
-
-            // Verbesserte Gegner-KI - aggressiver und intelligenter
-            let enemyMaxSpeed = gameState.mode === 'extreme' ? 2.75 : (gameState.mode === 'pro' ? 2.45 : 2.1);
-            let baseSpeed = 1.95 + (gameState.currentLevel * 0.045);
-            
-            // Der Gegner versucht, dich zu blocken, wenn du zu nah bist
-            let distanceToPlayer = Math.abs(enemyStats.x - playerStats.x);
-            let playerDirection = playerStats.x > enemyStats.x ? 1 : -1;
-            
-            // Aggressive Zielbestimmung - der Gegner fährt direkt auf dich zu
-            if(distanceToPlayer < 2.8) {
-                // Wenn der Gegner dicht bei dir ist, versucht er dich abzudrängen
-                enemyStats.targetX = playerStats.x + (playerDirection * 1.2);
-            } else {
-                // Sonst fährt er die optimale Linie
-                enemyStats.targetX = Math.sin(enemyStats.z * 0.025 + gameState.currentLevel) * 2.8;
-            }
-            
-            // Sanfte Verfolgung des Zielspurs mit erhöhter Aggressivität
-            let steerForce = (enemyStats.targetX - enemyStats.x) * 0.12;
-            enemyStats.x += steerForce + Math.sin(Date.now() / 500) * 0.04;
-            
-            // Grenzwerte für die Position
-            if(enemyStats.x < -4.5) enemyStats.x = -4.5;
-            if(enemyStats.x > 4.5) enemyStats.x = 4.5;
-            
-            // Gegner beschleunigt, wenn er hinter dir ist
-            if(enemyStats.z > playerStats.z) {
-                baseSpeed *= 1.08; // 8% schneller, wenn hinter dir
-            }
-            
-            enemyStats.z -= Math.min(enemyMaxSpeed, baseSpeed);
-            enemyVehicle.position.set(curveAt(enemyStats.z) + enemyStats.x, 0, enemyStats.z);
-            enemyVehicle.rotation.y = angleAt(enemyStats.z);
-
-            const targetX = curveAt(playerStats.z) + playerStats.x;
-            camera.position.x += (targetX - camera.position.x) * 0.08;
-            camera.position.y += (3.5 - camera.position.y) * 0.08;
-            camera.position.z += (playerStats.z + 7 - camera.position.z) * 0.08;
-            camera.lookAt(new THREE.Vector3(targetX, 1, playerStats.z - 10));
-
-            updateParticles();
-
-            let posText = (playerStats.z < enemyStats.z) ? "1" : "2";
-            document.getElementById('hud-pos').innerText = posText;
-            document.getElementById('hud-speed').innerText = Math.floor(playerStats.speed * 100);
-
-            if(playerStats.z <= -gameState.trackLength || enemyStats.z <= -gameState.trackLength) {
-                endRace();
-            }
-
-            renderer.render(scene, camera);
+        function setMode(mode) {
+            gameState.mode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.toggle('active', btn.id === 'mode-' + mode));
+            if(scene) init3D();
         }
 
         function generateLevelMenu() {
             let container = document.getElementById('level-grid');
-            container.innerHTML = "";
+            container.innerHTML = '';
             let cost = gameState.mode === 'extreme' ? 50 : (gameState.mode === 'pro' ? 40 : 30);
             for(let i = 1; i <= 40; i++) {
                 let div = document.createElement('div');
                 let isUnlocked = gameState.unlockedLevels.includes(i);
-
                 div.className = `level-item ${isUnlocked ? 'unlocked' : 'locked'}`;
                 if(i === gameState.currentLevel) div.className += ' current';
-
                 div.innerHTML = `Msn ${i}`;
                 if(!isUnlocked) div.innerHTML += `<span class="lock-cost">🪙 ${cost}</span>`;
-
                 div.onclick = () => {
                     if(isUnlocked) {
                         gameState.currentLevel = i;
@@ -571,7 +440,7 @@
                                 generateLevelMenu();
                             }
                         } else {
-                            alert("Nicht genug Credits! Kaufe welche im Shop oder gewinne vorherige Level.");
+                            alert('Nicht genug Credits! Kaufe welche im Shop oder gewinne vorherige Level.');
                         }
                     }
                 };
@@ -587,37 +456,25 @@
 
             playerStats.z = 0; playerStats.x = -2; playerStats.speed = 0;
             enemyStats.z = 0; enemyStats.x = 2; enemyStats.targetX = 2;
+            playerBoost.energy = 100;
+            playerBoost.active = false;
 
-            if(gameState.mode === 'standard') {
-                gameState.trackLength = 2000 + (gameState.currentLevel * 150);
-            } else if(gameState.mode === 'pro') {
-                gameState.trackLength = 3200 + (gameState.currentLevel * 250);
-            } else {
-                gameState.trackLength = 4500 + (gameState.currentLevel * 350);
-            }
+            if(gameState.mode === 'standard') gameState.trackLength = 2000 + (gameState.currentLevel * 150);
+            else if(gameState.mode === 'pro') gameState.trackLength = 3200 + (gameState.currentLevel * 250);
+            else gameState.trackLength = 4500 + (gameState.currentLevel * 350);
 
             document.getElementById('hud-level').innerText = gameState.currentLevel;
-            document.getElementById('menu-title').innerText = `${gameState.mode.toUpperCase()} - Mission ${gameState.currentLevel}`;
-
             buildTrackGrid();
             AudioEngine.playBGM();
 
             let cdVal = 3;
             let cdEl = document.getElementById('countdown');
-            cdEl.style.display = 'block';
-            cdEl.innerText = cdVal;
-
+            cdEl.style.display = 'block'; cdEl.innerText = cdVal;
             let timer = setInterval(() => {
                 cdVal--;
-                if(cdVal === 0) {
-                    cdEl.innerText = 'START!';
-                    gameState.playing = true;
-                } else if(cdVal < 0) {
-                    clearInterval(timer);
-                    cdEl.style.display = 'none';
-                } else {
-                    cdEl.innerText = cdVal;
-                }
+                if(cdVal === 0) { cdEl.innerText = 'START!'; gameState.playing = true; }
+                else if(cdVal < 0) { clearInterval(timer); cdEl.style.display = 'none'; }
+                else { cdEl.innerText = cdVal; }
             }, 1000);
         }
 
@@ -638,32 +495,22 @@
                 resDesc.innerText = `Du hast Mission ${gameState.currentLevel} (${gameState.mode}) geschafft! Belohnung: +${reward} Credits.`;
                 gameState.credits += reward;
                 AudioEngine.playWin();
-
-                if(gameState.currentLevel < 40 && !gameState.unlockedLevels.includes(gameState.currentLevel + 1)) {
-                    gameState.unlockedLevels.push(gameState.currentLevel + 1);
-                }
+                if(gameState.currentLevel < 40 && !gameState.unlockedLevels.includes(gameState.currentLevel + 1)) gameState.unlockedLevels.push(gameState.currentLevel + 1);
                 resBtn.innerText = 'Nächstes Level';
                 resBtn.onclick = () => {
-                    if(gameState.currentLevel < 40) {
-                        gameState.currentLevel++;
-                        startCountdown();
-                    } else {
-                        alert(`Du hast alle 40 Missionen im ${gameState.mode}-Modus geschafft! 🎉`);
-                        showModeSelect();
-                    }
+                    if(gameState.currentLevel < 40) { gameState.currentLevel++; startCountdown(); }
+                    else { alert(`Du hast alle 40 Missionen im ${gameState.mode}-Modus geschafft! 🎉`); showModeSelect(); }
                 };
             } else {
                 resTitle.innerText = '💥 Verloren!';
                 resTitle.style.color = '#ff3300';
-                resDesc.innerText = `Der Gegner war schneller! Versuch es nochmal oder wechsle den Modus.`;
+                resDesc.innerText = 'Der Gegner war schneller! Versuch es nochmal oder wechsle den Modus.';
                 AudioEngine.playLoose();
-
                 resBtn.innerText = 'Nochmal versuchen';
-                resBtn.onclick = () => { startCountdown(); };
+                resBtn.onclick = () => startCountdown();
             }
 
             saveData();
-
             document.getElementById('hud').classList.add('hidden');
             document.getElementById('controls').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
@@ -690,46 +537,99 @@
             showMenu();
         }
 
-        document.getElementById('mode-standard').addEventListener('click', function() {
-            gameState.mode = 'standard';
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-        });
+        function animate() {
+            requestAnimationFrame(animate);
+            if(!gameState.playing) return;
 
-        document.getElementById('mode-pro').addEventListener('click', function() {
-            gameState.mode = 'pro';
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-        });
+            let accel = gameState.mode === 'extreme' ? 0.085 : (gameState.mode === 'pro' ? 0.065 : 0.05);
+            let maxSpeed = gameState.mode === 'extreme' ? 2.9 : (gameState.mode === 'pro' ? 2.6 : 2.2);
 
-        document.getElementById('mode-extreme').addEventListener('click', function() {
-            gameState.mode = 'extreme';
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-        });
+            if(keys.gas) playerStats.speed = Math.min(playerStats.speed + accel, maxSpeed);
+            else playerStats.speed = Math.max(playerStats.speed - 0.035, 0);
 
-        document.getElementById('btn-start-mode').addEventListener('click', function() {
-            gameState.currentLevel = 1;
-            if(!gameState.unlockedLevels.includes(1)) {
-                gameState.unlockedLevels.push(1);
+            if(keys.boost && playerBoost.energy > 0) {
+                playerBoost.active = true;
+                playerBoost.energy = Math.max(0, playerBoost.energy - 2.2);
+                playerStats.speed = Math.min(playerStats.speed + 0.12, maxSpeed + 1.0);
+            } else {
+                playerBoost.active = false;
+                playerBoost.energy = Math.min(100, playerBoost.energy + 0.7);
             }
-            saveData();
-            showMenu();
+
+            if(keys.left) playerStats.x -= 0.16;
+            if(keys.right) playerStats.x += 0.16;
+
+            playerStats.z -= playerStats.speed;
+
+            if(playerStats.x < -4.8) { playerStats.x = -4.8; playerStats.speed *= 0.55; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
+            if(playerStats.x > 4.8) { playerStats.x = 4.8; playerStats.speed *= 0.55; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
+
+            playerVehicle.position.set(curveAt(playerStats.z) + playerStats.x, 0, playerStats.z);
+            playerVehicle.rotation.y = angleAt(playerStats.z);
+
+            AudioEngine.playEngine(playerStats.speed / (maxSpeed + 1.5));
+
+            let enemyMaxSpeed = gameState.mode === 'extreme' ? 2.75 : (gameState.mode === 'pro' ? 2.45 : 2.1);
+            let baseSpeed = 1.95 + gameState.currentLevel * 0.045;
+            let distance = Math.abs(enemyStats.x - playerStats.x);
+            let playerDir = playerStats.x > enemyStats.x ? 1 : -1;
+            enemyStats.targetX = distance < 2.8 ? (playerStats.x + playerDir * 1.2) : (Math.sin(enemyStats.z * 0.025 + gameState.currentLevel) * 2.8);
+            enemyStats.x += (enemyStats.targetX - enemyStats.x) * 0.12 + Math.sin(Date.now() / 500) * 0.04;
+            if(enemyStats.x < -4.5) enemyStats.x = -4.5; if(enemyStats.x > 4.5) enemyStats.x = 4.5;
+            if(enemyStats.z > playerStats.z) baseSpeed *= 1.08;
+            enemyStats.z -= Math.min(enemyMaxSpeed, baseSpeed);
+            enemyVehicle.position.set(curveAt(enemyStats.z) + enemyStats.x, 0, enemyStats.z);
+            enemyVehicle.rotation.y = angleAt(enemyStats.z);
+
+            let targetX = curveAt(playerStats.z) + playerStats.x;
+            camera.position.x += (targetX - camera.position.x) * 0.08;
+            camera.position.y += (3.5 - camera.position.y) * 0.08;
+            camera.position.z += (playerStats.z + 7 - camera.position.z) * 0.08;
+            camera.lookAt(new THREE.Vector3(targetX, 1, playerStats.z - 10));
+
+            updateParticles();
+            let posText = (playerStats.z < enemyStats.z) ? '1' : '2';
+            document.getElementById('hud-pos').innerText = posText;
+            document.getElementById('hud-speed').innerText = Math.floor(playerStats.speed * 100);
+            document.getElementById('hud-nitro').innerText = Math.max(0, Math.floor(playerBoost.energy));
+
+            if(playerStats.z <= -gameState.trackLength || enemyStats.z <= -gameState.trackLength) endRace();
+            renderer.render(scene, camera);
+        }
+
+        document.getElementById('mode-standard').addEventListener('click', () => setMode('standard'));
+        document.getElementById('mode-pro').addEventListener('click', () => setMode('pro'));
+        document.getElementById('mode-extreme').addEventListener('click', () => setMode('extreme'));
+        document.getElementById('btn-start-mode').addEventListener('click', () => { gameState.currentLevel = 1; if(!gameState.unlockedLevels.includes(1)) gameState.unlockedLevels.push(1); saveData(); showMenu(); });
+
+        document.getElementById('btn-open-shop').onclick = () => { document.getElementById('menu-screen').classList.add('hidden'); document.getElementById('shop-screen').classList.remove('hidden'); };
+        document.getElementById('btn-close-shop').onclick = () => showMenu();
+        document.getElementById('btn-result-menu').onclick = () => showModeSelect();
+        document.getElementById('btn-back-mode').onclick = () => showModeSelect();
+
+        window.addEventListener('keydown', e => {
+            if(e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+            if(e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+            if(e.key === 'ArrowUp' || e.key === 'w') keys.gas = true;
+            if(e.code === 'Space') keys.boost = true;
         });
 
-        document.getElementById('btn-open-shop').onclick = () => {
-            document.getElementById('menu-screen').classList.add('hidden');
-            document.getElementById('shop-screen').classList.remove('hidden');
+        window.addEventListener('keyup', e => {
+            if(e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+            if(e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+            if(e.key === 'ArrowUp' || e.key === 'w') keys.gas = false;
+            if(e.code === 'Space') keys.boost = false;
+        });
+
+        const wireTouch = (id, keyField) => {
+            let el = document.getElementById(id);
+            el.addEventListener('touchstart', e => { e.preventDefault(); keys[keyField] = true; }, { passive: false });
+            el.addEventListener('touchend', e => { e.preventDefault(); keys[keyField] = false; }, { passive: false });
         };
-        document.getElementById('btn-close-shop').onclick = () => {
-            showMenu();
-        };
-        document.getElementById('btn-result-menu').onclick = () => {
-            showModeSelect();
-        };
-        document.getElementById('btn-back-mode').onclick = () => {
-            showModeSelect();
-        };
+        wireTouch('btn-left', 'left');
+        wireTouch('btn-right', 'right');
+        wireTouch('btn-gas', 'gas');
+        wireTouch('btn-boost', 'boost');
 
         window.addEventListener('resize', () => {
             if(camera && renderer) {
@@ -742,6 +642,8 @@
         window.onload = () => {
             init3D();
             saveData();
+            generateLevelMenu();
+            setMode('standard');
             animate();
         };
     </script>
