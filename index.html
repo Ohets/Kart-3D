@@ -258,11 +258,11 @@
 
         function getTrackCurve(z, mode) {
             if(mode === 'pro') {
-                return Math.sin(z * 0.012) * 7.5 + Math.sin(z * 0.005 + 2) * 4 + Math.sin(z * 0.002) * 2.5;
+                return Math.sin(z * 0.016) * 9 + Math.sin(z * 0.006 + 2) * 5 + Math.sin(z * 0.0028) * 3;
             } else if(mode === 'extreme') {
-                return Math.sin(z * 0.015) * 9 + Math.sin(z * 0.006 + 3) * 5 + Math.sin(z * 0.0025) * 3;
+                return Math.sin(z * 0.02) * 11 + Math.sin(z * 0.007 + 3) * 6 + Math.sin(z * 0.0035) * 3.8;
             }
-            return Math.sin(z * 0.010) * 6 + Math.sin(z * 0.0047 + 1.4) * 3.5 + Math.sin(z * 0.0018) * 2.2;
+            return Math.sin(z * 0.013) * 8 + Math.sin(z * 0.005 + 1.8) * 4.8 + Math.sin(z * 0.0022) * 2.8;
         }
 
         function curveAt(z) {
@@ -271,11 +271,11 @@
 
         function curveSlope(z) {
             if(gameState.mode === 'pro') {
-                return 0.09 * Math.cos(z * 0.012) + 0.02 * Math.cos(z * 0.005 + 2) + 0.005 * Math.cos(z * 0.002);
+                return 0.144 * Math.cos(z * 0.016) + 0.03 * Math.cos(z * 0.006 + 2) + 0.0078 * Math.cos(z * 0.0028);
             } else if(gameState.mode === 'extreme') {
-                return 0.135 * Math.cos(z * 0.015) + 0.03 * Math.cos(z * 0.006 + 3) + 0.0075 * Math.cos(z * 0.0025);
+                return 0.22 * Math.cos(z * 0.02) + 0.042 * Math.cos(z * 0.007 + 3) + 0.0133 * Math.cos(z * 0.0035);
             }
-            return 0.06 * Math.cos(z * 0.010) + 0.01645 * Math.cos(z * 0.0047 + 1.4) + 0.00396 * Math.cos(z * 0.0018);
+            return 0.104 * Math.cos(z * 0.013) + 0.024 * Math.cos(z * 0.005 + 1.8) + 0.00616 * Math.cos(z * 0.0022);
         }
 
         function angleAt(z) {
@@ -319,7 +319,7 @@
             decorations.forEach(d => scene.remove(d));
             roadSegments = []; leftBarriers = []; rightBarriers = []; decorations = [];
 
-            let roadW = 16;
+            let roadW = gameState.mode === 'extreme' ? 11 : (gameState.mode === 'pro' ? 12 : 13);
             let segL = 20;
             let totalSegs = Math.ceil(gameState.trackLength / segL) + 5;
 
@@ -483,8 +483,8 @@
 
             playerStats.z -= playerStats.speed;
 
-            if(playerStats.x < -7.3) { playerStats.x = -7.3; playerStats.speed *= 0.5; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
-            if(playerStats.x > 7.3) { playerStats.x = 7.3; playerStats.speed *= 0.5; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
+            if(playerStats.x < -5.4) { playerStats.x = -5.4; playerStats.speed *= 0.5; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
+            if(playerStats.x > 5.4) { playerStats.x = 5.4; playerStats.speed *= 0.5; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
 
             playerVehicle.position.set(curveAt(playerStats.z) + playerStats.x, 0, playerStats.z);
             playerVehicle.rotation.y = angleAt(playerStats.z);
@@ -494,8 +494,8 @@
             let enemyMaxSpeed = gameState.mode === 'extreme' ? 2.5 : (gameState.mode === 'pro' ? 2.3 : 1.8);
             enemyStats.z -= Math.min(enemyMaxSpeed, 1.6 + (gameState.currentLevel * 0.02));
             enemyStats.x += Math.sin(Date.now() / 400) * (gameState.mode === 'extreme' ? 0.08 : 0.05);
-            if(enemyStats.x < -6) enemyStats.x = -6;
-            if(enemyStats.x > 6) enemyStats.x = 6;
+            if(enemyStats.x < -5.0) enemyStats.x = -5.0;
+            if(enemyStats.x > 5.0) enemyStats.x = 5.0;
             enemyVehicle.position.set(curveAt(enemyStats.z) + enemyStats.x, 0, enemyStats.z);
             enemyVehicle.rotation.y = angleAt(enemyStats.z);
 
@@ -627,7 +627,6 @@
                     }
                 };
             } else {
-                let cost = gameState.mode === 'extreme' ? 50 : (gameState.mode === 'pro' ? 40 : 30);
                 resTitle.innerText = '💥 Verloren!';
                 resTitle.style.color = '#ff3300';
                 resDesc.innerText = `Der Gegner war schneller! Versuch es nochmal oder wechsle den Modus.`;
