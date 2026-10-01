@@ -9,41 +9,50 @@
         body, html { width: 100%; height: 100%; overflow: hidden; background: #111; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; }
         #canvas3d { display: block; width: 100%; height: 100%; }
 
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.7); }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); z-index: 20; }
         .hidden { display: none !important; }
 
         h1 { font-size: 2.5rem; margin-bottom: 10px; color: #ffcc00; text-shadow: 3px 3px #ff3300; text-transform: uppercase; letter-spacing: 2px; }
         h2 { font-size: 1.5rem; margin-bottom: 20px; color: #00ffff; }
         p { font-size: 1rem; margin-bottom: 20px; max-width: 500px; color: #ddd; line-height: 1.5; }
 
-        .btn { background: linear-gradient(135deg, #ffcc00, #ff9900); color: #000; border: none; padding: 15px 35px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(255,153,0,0.4); }
+        .btn { background: linear-gradient(135deg, #ffcc00, #ff9900); color: #000; border: none; padding: 15px 35px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(255,153,0,0.4); transition: all 0.2s; }
+        .btn:hover { transform: scale(1.05); }
         .btn:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(255,153,0,0.6); }
         .btn-blue { background: linear-gradient(135deg, #00ffff, #0099ff); color: #fff; box-shadow: 0 5px 15px rgba(0,255,255,0.4); }
 
         #hud { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
-        .hud-top { display: flex; justify-content: space-between; width: 100%; }
-        .hud-card { background: rgba(0,0,0,0.6); border: 2px solid #333; padding: 10px 20px; border-radius: 15px; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; pointer-events: none; }
+        .hud-top { display: flex; justify-content: space-between; width: 100%; align-items: flex-start; }
+        .hud-card { background: rgba(0,0,0,0.7); border: 2px solid #333; padding: 12px 20px; border-radius: 15px; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; pointer-events: none; backdrop-filter: blur(5px); }
         .hud-yellow { border-color: #ffcc00; color: #ffcc00; }
         .hud-blue { border-color: #00ffff; color: #00ffff; }
 
-        .level-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; max-height: 50vh; overflow-y: auto; padding: 10px; width: 100%; max-width: 600px; background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.15); border-radius: 15px; }
-        @media (max-width: 600px) { .level-grid { grid-template-columns: repeat(4, 1fr); } }
-        .level-item { background: #222; border: 2px solid #444; border-radius: 10px; padding: 15px 5px; font-weight: bold; cursor: pointer; position: relative; transition: all 0.2s; }
+        .level-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; max-height: 50vh; overflow-y: auto; padding: 10px; width: 100%; max-width: 700px; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15); border-radius: 15px; }
+        @media (max-width: 600px) { .level-grid { grid-template-columns: repeat(4, 1fr); max-width: 500px; } }
+        .level-item { background: #222; border: 2px solid #444; border-radius: 10px; padding: 15px 8px; font-weight: bold; cursor: pointer; position: relative; transition: all 0.2s; text-align: center; }
+        .level-item:hover { background: #2a2a2a; transform: scale(1.02); }
         .level-item.unlocked { border-color: #00ff00; color: #00ff00; }
-        .level-item.locked { border-color: #ff3300; color: #999; opacity: 0.7; }
-        .level-item.current { background: #ffcc00; color: #000; border-color: #fff; }
+        .level-item.locked { border-color: #ff3300; color: #999; opacity: 0.6; cursor: not-allowed; }
+        .level-item.current { background: #ffcc00; color: #000; border-color: #fff; box-shadow: 0 0 15px rgba(255,204,0,0.6); }
         .level-item .lock-cost { font-size: 0.75rem; display: block; color: #ff9900; margin-top: 5px; }
 
         #controls { position: absolute; bottom: 20px; left: 0; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; z-index: 6; }
-        .control-btn { width: 75px; height: 75px; background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.6); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; font-weight: bold; }
-        .control-btn:active { background: rgba(255,255,255,0.5); }
+        .control-btn { width: 80px; height: 80px; background: rgba(255,255,255,0.15); border: 3px solid rgba(255,255,255,0.6); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.2rem; font-weight: bold; cursor: pointer; transition: all 0.1s; backdrop-filter: blur(5px); }
+        .control-btn:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
+        .control-btn:hover { background: rgba(255,255,255,0.25); }
         .ctrl-group { display: flex; gap: 15px; }
 
-        #countdown { font-size: 6rem; font-weight: bold; color: #ffcc00; text-shadow: 4px 4px #000; display: none; pointer-events: none; }
+        #countdown { font-size: 8rem; font-weight: bold; color: #ffcc00; text-shadow: 4px 4px #000, 8px 8px rgba(0,0,0,0.5); display: none; pointer-events: none; }
 
-        .shop-options { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 400px; }
-        .shop-item { background: #222; border: 2px solid #555; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .shop-options { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 450px; }
+        .shop-item { background: #222; border: 2px solid #555; padding: 18px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.2s; }
+        .shop-item:hover { background: #2a2a2a; border-color: #f90; }
         .shop-item:active { background: #333; }
+
+        .mode-selector { display: flex; gap: 15px; margin-bottom: 20px; justify-content: center; }
+        .mode-btn { background: rgba(255,255,255,0.1); border: 2px solid #666; color: #fff; padding: 10px 25px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+        .mode-btn.active { background: #ffcc00; color: #000; border-color: #ffcc00; box-shadow: 0 0 20px rgba(255,204,0,0.6); }
+        .mode-btn:hover { border-color: #ffcc00; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -55,11 +64,12 @@
             <div class="hud-card hud-yellow">🪙 Credits: <span id="hud-credits">100</span></div>
             <div class="hud-card hud-blue">🏁 Mission: <span id="hud-level">1</span>/40</div>
         </div>
-        <div class="hud-top" style="justify-content: center; margin-top: 10px;">
+        <div class="hud-top" style="justify-content: center; margin-top: 20px;">
             <div id="countdown">3</div>
         </div>
-        <div class="hud-top" style="align-items: flex-end; height: 100px;">
+        <div class="hud-top" style="align-items: flex-end; height: 100px; justify-content: flex-start;">
             <div class="hud-card" style="color: #fff;">Pos: <span id="hud-pos">2</span>/2</div>
+            <div class="hud-card hud-yellow" style="margin-left: 20px;">⚡ <span id="hud-speed">0</span> km/h</div>
         </div>
     </div>
 
@@ -69,41 +79,55 @@
             <div class="control-btn" id="btn-right">▶</div>
         </div>
         <div class="ctrl-group">
-            <div class="control-btn" id="btn-gas" style="background: rgba(0,255,0,0.2); border-color: rgba(0,255,0,0.6);">▲</div>
+            <div class="control-btn" id="btn-gas" style="background: rgba(0,255,0,0.15); border-color: rgba(0,255,0,0.8);">▲</div>
         </div>
     </div>
 
-    <div id="menu-screen" class="overlay">
+    <div id="mode-screen" class="overlay">
         <h1>Retro Kart 3D</h1>
-        <h2>Wähle eine Mission (1-40)</h2>
-        <div class="hud-card hud-yellow" style="margin-bottom: 15px; pointer-events:none;">🪙 Deine Credits: <span id="menu-credits">100</span></div>
+        <h2>Wähle einen Modus</h2>
+        <div class="mode-selector">
+            <button class="mode-btn active" id="mode-standard">🏁 Standard</button>
+            <button class="mode-btn" id="mode-pro">⚡ Pro</button>
+            <button class="mode-btn" id="mode-extreme">🔥 Extreme</button>
+        </div>
+        <button class="btn" id="btn-start-mode">Beginne Modus</button>
+    </div>
+
+    <div id="menu-screen" class="overlay hidden">
+        <h1>Retro Kart 3D</h1>
+        <h2 id="menu-title">Wähle eine Mission</h2>
+        <div class="hud-card hud-yellow" style="margin-bottom: 15px; pointer-events:none; z-index: 21;">🪙 Deine Credits: <span id="menu-credits">100</span></div>
         <div class="level-grid" id="level-grid"></div>
-        <button class="btn btn-blue" id="btn-open-shop">🛒 Credits kaufen</button>
+        <div style="display: flex; gap: 15px; margin-top: 20px;">
+            <button class="btn btn-blue" id="btn-open-shop">🛒 Credits kaufen</button>
+            <button class="btn" id="btn-back-mode">⬅ Modus wählen</button>
+        </div>
     </div>
 
     <div id="result-screen" class="overlay hidden">
-        <h1 id="result-title">Sieg!</h1>
-        <p id="result-desc">Du hast das Ziel als 1. erreicht!</p>
-        <div class="hud-card hud-yellow" style="margin-bottom: 20px; pointer-events:none;">🪙 Credits: <span id="result-credits">100</span></div>
+        <h1 id="result-title">🏆 Sieg!</h1>
+        <p id="result-desc">Du hast das Ziel erreicht!</p>
+        <div class="hud-card hud-yellow" style="margin-bottom: 20px; pointer-events:none; z-index: 21;">🪙 Credits: <span id="result-credits">100</span></div>
         <button class="btn" id="btn-result-action">Nächstes Level</button>
         <button class="btn btn-blue" id="btn-result-menu">Hauptmenü</button>
     </div>
 
     <div id="shop-screen" class="overlay hidden">
-        <h1>Münz-Shop</h1>
-        <p>Kaufe Credits, um blockierte Strecken sofort freizuschalten!</p>
+        <h1>💰 Münz-Shop</h1>
+        <p>Kaufe Credits, um blockierte Strecken freizuschalten!</p>
         <div class="shop-options">
             <div class="shop-item" onclick="buyCredits(50, 0.99)">
                 <span>🪙 50 Credits</span>
-                <button class="btn" style="padding:5px 15px; margin:0; font-size:1rem;">0,99 €</button>
+                <button class="btn" style="padding:8px 15px; margin:0; font-size:0.9rem;">0,99 €</button>
             </div>
             <div class="shop-item" onclick="buyCredits(200, 2.99)">
                 <span>🪙 200 Credits</span>
-                <button class="btn" style="padding:5px 15px; margin:0; font-size:1rem;">2,99 €</button>
+                <button class="btn" style="padding:8px 15px; margin:0; font-size:0.9rem;">2,99 €</button>
             </div>
             <div class="shop-item" onclick="buyCredits(500, 4.99)">
                 <span>🪙 500 Credits</span>
-                <button class="btn" style="padding:5px 15px; margin:0; font-size:1rem;">4,99 €</button>
+                <button class="btn" style="padding:8px 15px; margin:0; font-size:0.9rem;">4,99 €</button>
             </div>
         </div>
         <button class="btn btn-blue" id="btn-close-shop" style="margin-top:20px;">Zurück</button>
@@ -204,12 +228,13 @@
         };
 
         const gameState = {
-            credits: parseInt(localStorage.getItem('mk3d_credits')) || 100,
+            credits: parseInt(localStorage.getItem('mk3d_credits')) || 500,
             unlockedLevels: JSON.parse(localStorage.getItem('mk3d_levels')) || [1],
             currentLevel: 1,
             playing: false,
             countdown: 3,
-            trackLength: 1000
+            trackLength: 1000,
+            mode: 'standard'
         };
 
         function saveData() {
@@ -231,11 +256,25 @@
         let playerStats = { z: 0, x: 0, speed: 0, maxSpeed: 2.2, accel: 0.05, decel: 0.03 };
         let enemyStats = { z: 0, x: 2, speed: 1.8 };
 
-        function curveAt(z) {
+        function getTrackCurve(z, mode) {
+            if(mode === 'pro') {
+                return Math.sin(z * 0.012) * 7.5 + Math.sin(z * 0.005 + 2) * 4 + Math.sin(z * 0.002) * 2.5;
+            } else if(mode === 'extreme') {
+                return Math.sin(z * 0.015) * 9 + Math.sin(z * 0.006 + 3) * 5 + Math.sin(z * 0.0025) * 3;
+            }
             return Math.sin(z * 0.010) * 6 + Math.sin(z * 0.0047 + 1.4) * 3.5 + Math.sin(z * 0.0018) * 2.2;
         }
 
+        function curveAt(z) {
+            return getTrackCurve(z, gameState.mode);
+        }
+
         function curveSlope(z) {
+            if(gameState.mode === 'pro') {
+                return 0.09 * Math.cos(z * 0.012) + 0.02 * Math.cos(z * 0.005 + 2) + 0.005 * Math.cos(z * 0.002);
+            } else if(gameState.mode === 'extreme') {
+                return 0.135 * Math.cos(z * 0.015) + 0.03 * Math.cos(z * 0.006 + 3) + 0.0075 * Math.cos(z * 0.0025);
+            }
             return 0.06 * Math.cos(z * 0.010) + 0.01645 * Math.cos(z * 0.0047 + 1.4) + 0.00396 * Math.cos(z * 0.0018);
         }
 
@@ -245,23 +284,25 @@
 
         function init3D() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87ceeb);
-            scene.fog = new THREE.FogExp2(0x87ceeb, 0.015);
+            scene.background = new THREE.Color(gameState.mode === 'extreme' ? 0x1a1a2e : 0x87ceeb);
+            scene.fog = new THREE.FogExp2(gameState.mode === 'extreme' ? 0x1a1a2e : 0x87ceeb, gameState.mode === 'extreme' ? 0.012 : 0.015);
 
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas3d'), antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
 
-            let ambient = new THREE.AmbientLight(0xffffff, 0.7);
+            let ambient = new THREE.AmbientLight(0xffffff, gameState.mode === 'extreme' ? 0.5 : 0.7);
             scene.add(ambient);
-            let sun = new THREE.DirectionalLight(0xffffff, 0.8);
+            let sun = new THREE.DirectionalLight(0xffffff, gameState.mode === 'extreme' ? 0.6 : 0.8);
             sun.position.set(10, 30, 20);
+            sun.castShadow = true;
             scene.add(sun);
 
+            let grassColor = gameState.mode === 'extreme' ? 0x1a3a1a : 0x3aa84c;
             let grass = new THREE.Mesh(
                 new THREE.PlaneGeometry(500, 500),
-                new THREE.MeshPhongMaterial({ color: 0x3aa84c })
+                new THREE.MeshPhongMaterial({ color: grassColor })
             );
             grass.rotation.x = -Math.PI / 2;
             grass.position.y = -0.2;
@@ -288,7 +329,8 @@
                 let ang = angleAt(z);
                 let isEven = i % 2 === 0;
 
-                let roadMat = new THREE.MeshPhongMaterial({ color: isEven ? 0x444444 : 0x555555 });
+                let roadColor = isEven ? (gameState.mode === 'extreme' ? 0x333333 : 0x444444) : (gameState.mode === 'extreme' ? 0x2a2a2a : 0x555555);
+                let roadMat = new THREE.MeshPhongMaterial({ color: roadColor });
                 let road = new THREE.Mesh(new THREE.PlaneGeometry(roadW, segL + 1), roadMat);
                 road.rotation.x = -Math.PI / 2;
                 road.rotation.z = ang;
@@ -298,14 +340,15 @@
 
                 let centerStripe = new THREE.Mesh(
                     new THREE.BoxGeometry(0.5, 0.05, segL * 0.55),
-                    new THREE.MeshBasicMaterial({ color: 0xf7f7f7 })
+                    new THREE.MeshBasicMaterial({ color: gameState.mode === 'extreme' ? 0xffff00 : 0xf7f7f7 })
                 );
                 centerStripe.position.set(x, 0.05, z);
                 centerStripe.rotation.z = ang;
                 scene.add(centerStripe);
                 decorations.push(centerStripe);
 
-                let barrierMat = new THREE.MeshPhongMaterial({ color: isEven ? 0xff0000 : 0xffffff });
+                let barrierColor = gameState.mode === 'pro' ? 0xff6600 : (gameState.mode === 'extreme' ? 0xff1111 : (isEven ? 0xff0000 : 0xffffff));
+                let barrierMat = new THREE.MeshPhongMaterial({ color: barrierColor });
                 let barrierGeo = new THREE.BoxGeometry(0.6, 1.2, segL);
 
                 let lb = new THREE.Mesh(barrierGeo, barrierMat);
@@ -320,12 +363,13 @@
                 scene.add(rb);
                 rightBarriers.push(rb);
 
-                if(i % 3 === 0) {
+                if(i % 2 === 0) {
                     let side = Math.random() > 0.5 ? 1 : -1;
                     let tree = new THREE.Group();
                     let trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 1.1, 8), new THREE.MeshPhongMaterial({ color: 0x8b5a2b }));
                     trunk.position.y = 0.55;
-                    let leaves = new THREE.Mesh(new THREE.SphereGeometry(0.8, 10, 10), new THREE.MeshPhongMaterial({ color: 0x2f9e44 }));
+                    let treeColor = gameState.mode === 'extreme' ? 0x1a5c1a : 0x2f9e44;
+                    let leaves = new THREE.Mesh(new THREE.SphereGeometry(0.8, 10, 10), new THREE.MeshPhongMaterial({ color: treeColor }));
                     leaves.position.y = 1.5;
                     tree.add(trunk); tree.add(leaves);
                     tree.position.set(x + side * (roadW / 2 + 3), 0, z + (Math.random() - 0.5) * 6);
@@ -335,7 +379,7 @@
             }
 
             let finishGeo = new THREE.BoxGeometry(roadW, 1, 1);
-            let finishMat = new THREE.MeshPhongMaterial({ color: 0xffff00 });
+            let finishMat = new THREE.MeshPhongMaterial({ color: gameState.mode === 'extreme' ? 0xff1111 : 0xffff00 });
             let finishSign = new THREE.Mesh(finishGeo, finishMat);
             finishSign.position.set(curveAt(-gameState.trackLength), 6, -gameState.trackLength);
             finishSign.rotation.y = angleAt(-gameState.trackLength);
@@ -380,7 +424,7 @@
 
         function createSpeedSpark(x, y, z) {
             let pGeo = new THREE.SphereGeometry(0.1, 4, 4);
-            let pMat = new THREE.MeshBasicMaterial({ color: 0xffcc00 });
+            let pMat = new THREE.MeshBasicMaterial({ color: gameState.mode === 'extreme' ? 0xff1111 : 0xffcc00 });
             let p = new THREE.Mesh(pGeo, pMat);
             p.position.set(x, y, z);
             scene.add(p);
@@ -425,10 +469,13 @@
             requestAnimationFrame(animate);
             if(!gameState.playing) return;
 
+            let accel = gameState.mode === 'extreme' ? 0.08 : (gameState.mode === 'pro' ? 0.06 : 0.05);
+            let maxSpeed = gameState.mode === 'extreme' ? 2.8 : (gameState.mode === 'pro' ? 2.5 : 2.2);
+
             if(keys.gas) {
-                playerStats.speed = Math.min(playerStats.speed + playerStats.accel, playerStats.maxSpeed);
+                playerStats.speed = Math.min(playerStats.speed + accel, maxSpeed);
             } else {
-                playerStats.speed = Math.max(playerStats.speed - playerStats.decel, 0);
+                playerStats.speed = Math.max(playerStats.speed - 0.03, 0);
             }
 
             if(keys.left) playerStats.x -= 0.15;
@@ -442,10 +489,11 @@
             playerVehicle.position.set(curveAt(playerStats.z) + playerStats.x, 0, playerStats.z);
             playerVehicle.rotation.y = angleAt(playerStats.z);
 
-            AudioEngine.playEngine(playerStats.speed / playerStats.maxSpeed);
+            AudioEngine.playEngine(playerStats.speed / maxSpeed);
 
-            enemyStats.z -= enemyStats.speed;
-            enemyStats.x += Math.sin(Date.now() / 400) * 0.05;
+            let enemyMaxSpeed = gameState.mode === 'extreme' ? 2.5 : (gameState.mode === 'pro' ? 2.3 : 1.8);
+            enemyStats.z -= Math.min(enemyMaxSpeed, 1.6 + (gameState.currentLevel * 0.02));
+            enemyStats.x += Math.sin(Date.now() / 400) * (gameState.mode === 'extreme' ? 0.08 : 0.05);
             if(enemyStats.x < -6) enemyStats.x = -6;
             if(enemyStats.x > 6) enemyStats.x = 6;
             enemyVehicle.position.set(curveAt(enemyStats.z) + enemyStats.x, 0, enemyStats.z);
@@ -461,6 +509,7 @@
 
             let posText = (playerStats.z < enemyStats.z) ? "1" : "2";
             document.getElementById('hud-pos').innerText = posText;
+            document.getElementById('hud-speed').innerText = Math.floor(playerStats.speed * 100);
 
             if(playerStats.z <= -gameState.trackLength || enemyStats.z <= -gameState.trackLength) {
                 endRace();
@@ -472,6 +521,7 @@
         function generateLevelMenu() {
             let container = document.getElementById('level-grid');
             container.innerHTML = "";
+            let cost = gameState.mode === 'extreme' ? 50 : (gameState.mode === 'pro' ? 40 : 30);
             for(let i = 1; i <= 40; i++) {
                 let div = document.createElement('div');
                 let isUnlocked = gameState.unlockedLevels.includes(i);
@@ -480,16 +530,16 @@
                 if(i === gameState.currentLevel) div.className += ' current';
 
                 div.innerHTML = `Msn ${i}`;
-                if(!isUnlocked) div.innerHTML += '<span class="lock-cost">🪙 30</span>';
+                if(!isUnlocked) div.innerHTML += `<span class="lock-cost">🪙 ${cost}</span>`;
 
                 div.onclick = () => {
                     if(isUnlocked) {
                         gameState.currentLevel = i;
                         startCountdown();
                     } else {
-                        if(gameState.credits >= 30) {
-                            if(confirm(`Möchtest du Mission ${i} für 30 Credits freischalten?`)) {
-                                gameState.credits -= 30;
+                        if(gameState.credits >= cost) {
+                            if(confirm(`Möchtest du Mission ${i} für ${cost} Credits freischalten?`)) {
+                                gameState.credits -= cost;
                                 gameState.unlockedLevels.push(i);
                                 saveData();
                                 generateLevelMenu();
@@ -511,10 +561,17 @@
 
             playerStats.z = 0; playerStats.x = -2; playerStats.speed = 0;
             enemyStats.z = 0; enemyStats.x = 2;
-            enemyStats.speed = 1.6 + (gameState.currentLevel * 0.02);
 
-            gameState.trackLength = 1800 + (gameState.currentLevel * 120);
+            if(gameState.mode === 'standard') {
+                gameState.trackLength = 1800 + (gameState.currentLevel * 120);
+            } else if(gameState.mode === 'pro') {
+                gameState.trackLength = 2500 + (gameState.currentLevel * 200);
+            } else {
+                gameState.trackLength = 3500 + (gameState.currentLevel * 300);
+            }
+
             document.getElementById('hud-level').innerText = gameState.currentLevel;
+            document.getElementById('menu-title').innerText = `${gameState.mode.toUpperCase()} - Mission ${gameState.currentLevel}`;
 
             buildTrackGrid();
             AudioEngine.playBGM();
@@ -549,10 +606,11 @@
             let resBtn = document.getElementById('btn-result-action');
 
             if(win) {
+                let reward = gameState.mode === 'extreme' ? 200 : (gameState.mode === 'pro' ? 100 : 50);
                 resTitle.innerText = '🏆 Sieg!';
                 resTitle.style.color = '#00ff00';
-                resDesc.innerText = `Du hast Mission ${gameState.currentLevel} erfolgreich beendet! Belohnung: +50 Credits.`;
-                gameState.credits += 50;
+                resDesc.innerText = `Du hast Mission ${gameState.currentLevel} (${gameState.mode}) geschafft! Belohnung: +${reward} Credits.`;
+                gameState.credits += reward;
                 AudioEngine.playWin();
 
                 if(gameState.currentLevel < 40 && !gameState.unlockedLevels.includes(gameState.currentLevel + 1)) {
@@ -564,14 +622,15 @@
                         gameState.currentLevel++;
                         startCountdown();
                     } else {
-                        alert('Du hast alle Missionen geschafft!');
-                        showMenu();
+                        alert(`Du hast alle 40 Missionen im ${gameState.mode}-Modus geschafft! 🎉`);
+                        showModeSelect();
                     }
                 };
             } else {
+                let cost = gameState.mode === 'extreme' ? 50 : (gameState.mode === 'pro' ? 40 : 30);
                 resTitle.innerText = '💥 Verloren!';
                 resTitle.style.color = '#ff3300';
-                resDesc.innerText = 'Der Gegner war schneller im Ziel! Schalte das nächste Level direkt für 30 Credits frei oder versuche es nochmal.';
+                resDesc.innerText = `Der Gegner war schneller! Versuch es nochmal oder wechsle den Modus.`;
                 AudioEngine.playLoose();
 
                 resBtn.innerText = 'Nochmal versuchen';
@@ -585,7 +644,14 @@
             document.getElementById('result-screen').classList.remove('hidden');
         }
 
+        function showModeSelect() {
+            document.getElementById('mode-screen').classList.remove('hidden');
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+        }
+
         function showMenu() {
+            document.getElementById('mode-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.add('hidden');
             document.getElementById('shop-screen').classList.add('hidden');
             document.getElementById('menu-screen').classList.remove('hidden');
@@ -599,6 +665,33 @@
             showMenu();
         }
 
+        document.getElementById('mode-standard').addEventListener('click', function() {
+            gameState.mode = 'standard';
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+
+        document.getElementById('mode-pro').addEventListener('click', function() {
+            gameState.mode = 'pro';
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+
+        document.getElementById('mode-extreme').addEventListener('click', function() {
+            gameState.mode = 'extreme';
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+
+        document.getElementById('btn-start-mode').addEventListener('click', function() {
+            gameState.currentLevel = 1;
+            if(!gameState.unlockedLevels.includes(1)) {
+                gameState.unlockedLevels.push(1);
+            }
+            saveData();
+            showMenu();
+        });
+
         document.getElementById('btn-open-shop').onclick = () => {
             document.getElementById('menu-screen').classList.add('hidden');
             document.getElementById('shop-screen').classList.remove('hidden');
@@ -607,7 +700,10 @@
             showMenu();
         };
         document.getElementById('btn-result-menu').onclick = () => {
-            showMenu();
+            showModeSelect();
+        };
+        document.getElementById('btn-back-mode').onclick = () => {
+            showModeSelect();
         };
 
         window.addEventListener('resize', () => {
@@ -620,7 +716,6 @@
 
         window.onload = () => {
             init3D();
-            generateLevelMenu();
             saveData();
             animate();
         };
