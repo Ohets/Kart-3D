@@ -454,7 +454,7 @@
             document.getElementById('hud').classList.remove('hidden');
             document.getElementById('controls').classList.remove('hidden');
 
-            playerStats.z = 0; playerStats.x = -2; playerStats.speed = 0;
+            playerStats.z = 0; playerStats.x = 0; playerStats.speed = 0;
             enemyStats.z = 0; enemyStats.x = 2; enemyStats.targetX = 2;
             playerBoost.energy = 100;
             playerBoost.active = false;
@@ -561,11 +561,14 @@
 
             playerStats.z -= playerStats.speed;
 
-            if(playerStats.x < -4.8) { playerStats.x = -4.8; playerStats.speed *= 0.55; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
-            if(playerStats.x > 4.8) { playerStats.x = 4.8; playerStats.speed *= 0.55; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
+            let trackWidth = gameState.mode === 'extreme' ? 9 : (gameState.mode === 'pro' ? 10.5 : 12);
+            let boundaryX = trackWidth / 2 - 0.3;
 
-            playerVehicle.position.set(curveAt(playerStats.z) + playerStats.x, 0, playerStats.z);
-            playerVehicle.rotation.y = angleAt(playerStats.z);
+            if(playerStats.x < -boundaryX) { playerStats.x = -boundaryX; playerStats.speed *= 0.55; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
+            if(playerStats.x > boundaryX) { playerStats.x = boundaryX; playerStats.speed *= 0.55; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
+
+            playerVehicle.position.set(playerStats.x, 0, playerStats.z);
+            playerVehicle.rotation.y = 0;
 
             AudioEngine.playEngine(playerStats.speed / (maxSpeed + 1.5));
 
@@ -575,17 +578,18 @@
             let playerDir = playerStats.x > enemyStats.x ? 1 : -1;
             enemyStats.targetX = distance < 2.8 ? (playerStats.x + playerDir * 1.2) : (Math.sin(enemyStats.z * 0.025 + gameState.currentLevel) * 2.8);
             enemyStats.x += (enemyStats.targetX - enemyStats.x) * 0.12 + Math.sin(Date.now() / 500) * 0.04;
-            if(enemyStats.x < -4.5) enemyStats.x = -4.5; if(enemyStats.x > 4.5) enemyStats.x = 4.5;
+            if(enemyStats.x < -boundaryX) enemyStats.x = -boundaryX; 
+            if(enemyStats.x > boundaryX) enemyStats.x = boundaryX;
             if(enemyStats.z > playerStats.z) baseSpeed *= 1.08;
             enemyStats.z -= Math.min(enemyMaxSpeed, baseSpeed);
-            enemyVehicle.position.set(curveAt(enemyStats.z) + enemyStats.x, 0, enemyStats.z);
-            enemyVehicle.rotation.y = angleAt(enemyStats.z);
+            enemyVehicle.position.set(enemyStats.x, 0, enemyStats.z);
+            enemyVehicle.rotation.y = 0;
 
-            let targetX = curveAt(playerStats.z) + playerStats.x;
-            camera.position.x += (targetX - camera.position.x) * 0.08;
+            let trackCurve = curveAt(playerStats.z);
+            camera.position.x += (playerStats.x - camera.position.x) * 0.08;
             camera.position.y += (3.5 - camera.position.y) * 0.08;
             camera.position.z += (playerStats.z + 7 - camera.position.z) * 0.08;
-            camera.lookAt(new THREE.Vector3(targetX, 1, playerStats.z - 10));
+            camera.lookAt(new THREE.Vector3(playerStats.x, 1, playerStats.z - 10));
 
             updateParticles();
             let posText = (playerStats.z < enemyStats.z) ? '1' : '2';
