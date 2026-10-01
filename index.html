@@ -258,9 +258,9 @@
 
         function getTrackCurve(z, mode) {
             if(mode === 'pro') {
-                return Math.sin(z * 0.016) * 9 + Math.sin(z * 0.006 + 2) * 5 + Math.sin(z * 0.0028) * 3;
+                return Math.sin(z * 0.022) * 7.5 + Math.sin(z * 0.0075 + 1.7) * 5.2 + Math.sin(z * 0.0032 + 0.8) * 3.5 + Math.sin(z * 0.0013) * 1.8;
             } else if(mode === 'extreme') {
-                return Math.sin(z * 0.02) * 11 + Math.sin(z * 0.007 + 3) * 6 + Math.sin(z * 0.0035) * 3.8;
+                return Math.sin(z * 0.028) * 9.6 + Math.sin(z * 0.009 + 2.1) * 6.3 + Math.sin(z * 0.0044 + 0.7) * 4.0 + Math.sin(z * 0.0017 + 1.4) * 2.3;
             }
             return Math.sin(z * 0.013) * 8 + Math.sin(z * 0.005 + 1.8) * 4.8 + Math.sin(z * 0.0022) * 2.8;
         }
@@ -271,9 +271,9 @@
 
         function curveSlope(z) {
             if(gameState.mode === 'pro') {
-                return 0.144 * Math.cos(z * 0.016) + 0.03 * Math.cos(z * 0.006 + 2) + 0.0078 * Math.cos(z * 0.0028);
+                return 0.165 * Math.cos(z * 0.022) + 0.039 * Math.cos(z * 0.0075 + 1.7) + 0.0112 * Math.cos(z * 0.0032 + 0.8) + 0.00235 * Math.cos(z * 0.0013);
             } else if(gameState.mode === 'extreme') {
-                return 0.22 * Math.cos(z * 0.02) + 0.042 * Math.cos(z * 0.007 + 3) + 0.0133 * Math.cos(z * 0.0035);
+                return 0.27 * Math.cos(z * 0.028) + 0.0567 * Math.cos(z * 0.009 + 2.1) + 0.0176 * Math.cos(z * 0.0044 + 0.7) + 0.0039 * Math.cos(z * 0.0017 + 1.4);
             }
             return 0.104 * Math.cos(z * 0.013) + 0.024 * Math.cos(z * 0.005 + 1.8) + 0.00616 * Math.cos(z * 0.0022);
         }
@@ -285,7 +285,7 @@
         function init3D() {
             scene = new THREE.Scene();
             scene.background = new THREE.Color(gameState.mode === 'extreme' ? 0x1a1a2e : 0x87ceeb);
-            scene.fog = new THREE.FogExp2(gameState.mode === 'extreme' ? 0x1a1a2e : 0x87ceeb, gameState.mode === 'extreme' ? 0.012 : 0.015);
+            scene.fog = new THREE.FogExp2(gameState.mode === 'extreme' ? 0x1a1a2e : 0x87ceeb, gameState.mode === 'extreme' ? 0.013 : 0.015);
 
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas3d'), antialias: true });
@@ -319,7 +319,7 @@
             decorations.forEach(d => scene.remove(d));
             roadSegments = []; leftBarriers = []; rightBarriers = []; decorations = [];
 
-            let roadW = gameState.mode === 'extreme' ? 11 : (gameState.mode === 'pro' ? 12 : 13);
+            let roadW = gameState.mode === 'extreme' ? 8.8 : (gameState.mode === 'pro' ? 10.2 : 11.8);
             let segL = 20;
             let totalSegs = Math.ceil(gameState.trackLength / segL) + 5;
 
@@ -339,7 +339,7 @@
                 roadSegments.push(road);
 
                 let centerStripe = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.5, 0.05, segL * 0.55),
+                    new THREE.BoxGeometry(0.42, 0.05, segL * 0.52),
                     new THREE.MeshBasicMaterial({ color: gameState.mode === 'extreme' ? 0xffff00 : 0xf7f7f7 })
                 );
                 centerStripe.position.set(x, 0.05, z);
@@ -349,7 +349,7 @@
 
                 let barrierColor = gameState.mode === 'pro' ? 0xff6600 : (gameState.mode === 'extreme' ? 0xff1111 : (isEven ? 0xff0000 : 0xffffff));
                 let barrierMat = new THREE.MeshPhongMaterial({ color: barrierColor });
-                let barrierGeo = new THREE.BoxGeometry(0.6, 1.2, segL);
+                let barrierGeo = new THREE.BoxGeometry(0.55, 1.2, segL);
 
                 let lb = new THREE.Mesh(barrierGeo, barrierMat);
                 lb.position.set(x - roadW / 2, 0.6, z);
@@ -469,33 +469,33 @@
             requestAnimationFrame(animate);
             if(!gameState.playing) return;
 
-            let accel = gameState.mode === 'extreme' ? 0.08 : (gameState.mode === 'pro' ? 0.06 : 0.05);
-            let maxSpeed = gameState.mode === 'extreme' ? 2.8 : (gameState.mode === 'pro' ? 2.5 : 2.2);
+            let accel = gameState.mode === 'extreme' ? 0.085 : (gameState.mode === 'pro' ? 0.065 : 0.05);
+            let maxSpeed = gameState.mode === 'extreme' ? 2.9 : (gameState.mode === 'pro' ? 2.6 : 2.2);
 
             if(keys.gas) {
                 playerStats.speed = Math.min(playerStats.speed + accel, maxSpeed);
             } else {
-                playerStats.speed = Math.max(playerStats.speed - 0.03, 0);
+                playerStats.speed = Math.max(playerStats.speed - 0.035, 0);
             }
 
-            if(keys.left) playerStats.x -= 0.15;
-            if(keys.right) playerStats.x += 0.15;
+            if(keys.left) playerStats.x -= 0.16;
+            if(keys.right) playerStats.x += 0.16;
 
             playerStats.z -= playerStats.speed;
 
-            if(playerStats.x < -5.4) { playerStats.x = -5.4; playerStats.speed *= 0.5; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
-            if(playerStats.x > 5.4) { playerStats.x = 5.4; playerStats.speed *= 0.5; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
+            if(playerStats.x < -4.8) { playerStats.x = -4.8; playerStats.speed *= 0.55; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
+            if(playerStats.x > 4.8) { playerStats.x = 4.8; playerStats.speed *= 0.55; AudioEngine.playCrash(); createSpeedSpark(playerStats.x, 0.5, playerStats.z); }
 
             playerVehicle.position.set(curveAt(playerStats.z) + playerStats.x, 0, playerStats.z);
             playerVehicle.rotation.y = angleAt(playerStats.z);
 
             AudioEngine.playEngine(playerStats.speed / maxSpeed);
 
-            let enemyMaxSpeed = gameState.mode === 'extreme' ? 2.5 : (gameState.mode === 'pro' ? 2.3 : 1.8);
-            enemyStats.z -= Math.min(enemyMaxSpeed, 1.6 + (gameState.currentLevel * 0.02));
-            enemyStats.x += Math.sin(Date.now() / 400) * (gameState.mode === 'extreme' ? 0.08 : 0.05);
-            if(enemyStats.x < -5.0) enemyStats.x = -5.0;
-            if(enemyStats.x > 5.0) enemyStats.x = 5.0;
+            let enemyMaxSpeed = gameState.mode === 'extreme' ? 2.6 : (gameState.mode === 'pro' ? 2.35 : 1.8);
+            enemyStats.z -= Math.min(enemyMaxSpeed, 1.8 + (gameState.currentLevel * 0.025));
+            enemyStats.x += Math.sin(Date.now() / 360) * (gameState.mode === 'extreme' ? 0.1 : 0.06);
+            if(enemyStats.x < -4.5) enemyStats.x = -4.5;
+            if(enemyStats.x > 4.5) enemyStats.x = 4.5;
             enemyVehicle.position.set(curveAt(enemyStats.z) + enemyStats.x, 0, enemyStats.z);
             enemyVehicle.rotation.y = angleAt(enemyStats.z);
 
@@ -563,11 +563,11 @@
             enemyStats.z = 0; enemyStats.x = 2;
 
             if(gameState.mode === 'standard') {
-                gameState.trackLength = 1800 + (gameState.currentLevel * 120);
+                gameState.trackLength = 2000 + (gameState.currentLevel * 150);
             } else if(gameState.mode === 'pro') {
-                gameState.trackLength = 2500 + (gameState.currentLevel * 200);
+                gameState.trackLength = 3200 + (gameState.currentLevel * 250);
             } else {
-                gameState.trackLength = 3500 + (gameState.currentLevel * 300);
+                gameState.trackLength = 4500 + (gameState.currentLevel * 350);
             }
 
             document.getElementById('hud-level').innerText = gameState.currentLevel;
